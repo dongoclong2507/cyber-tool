@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DOLONG-CYBER TOOL</title>
+<style>
+:root {
+  --primary: #00E5FF;
+  --primary-glow: #00B8D4;
+  --primary-light: #E0F7FA;
+  --green: #00E676;
+  --green-bg: #E8F5E9;
+  --red: #FF1744;
+  --red-bg: #FFEBEE;
+  --amber: #FFC400;
+  --amber-bg: #FFF8E1;
+  --bg-body: #05060A;
+  --bg-panel: #0B0E17;
+  --bg-panel-2: #0F1320;
+  --text-main: #E2E8F0;
+  --text-muted: #6B7A99;
+  --border: #1A2035;
+  --border-glow: #00E5FF33;
+  --radius: 14px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { min-height: 100vh; }
+body {
+  font-family: var(--font); background: var(--bg-body); color: var(--text-main);
+  padding: 12px; padding-bottom: 60px; overflow-x: hidden;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(0,229,255,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(0,230,118,0.05) 0%, transparent 60%),
+    repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(0,229,255,0.015) 40px, rgba(0,229,255,0.015) 41px),
+    repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(0,229,255,0.015) 40px, rgba(0,229,255,0.015) 41px);
+  position: relative;
+}
+
+/* ===== NỀN CODE CHẠY ===== */
+#bgCode {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+  font-family: var(--mono); font-size: 10px; line-height: 1.6; color: #00E5FF;
+  opacity: 0.045; white-space: pre; padding: 8px;
+  user-select: none;
+}
+#bgCode .line { animation: scrollCode 20s linear infinite; }
+@keyframes scrollCode {
+  from { transform: translateY(0); }
+  to { transform: translateY(-50%); }
+}
+
+/* ===== BÁNH RĂNG NỀN ===== */
+.gear-bg {
+  position: fixed; z-index: 0; pointer-events: none; opacity: 0.05;
+  border: 2px solid #00E5FF; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.gear-bg::before {
+  content: ''; position: absolute; width: 100%; height: 100%;
+  border: 3px dashed #00E5FF; border-radius: 50%;
+  animation: spinGear 30s linear infinite;
+}
+.gear-bg::after {
+  content: ''; position: absolute; width: 50%; height: 50%;
+  border: 2px solid #00E5FF; border-radius: 50%;
+}
+.gear-1 { width: 220px; height: 220px; top: 10%; right: -60px; }
+.gear-1::before { animation-duration: 25s; }
+.gear-2 { width: 160px; height: 160px; bottom: 15%; left: -50px; }
+.gear-2::before { animation-duration: 18s; animation-direction: reverse; }
+.gear-3 { width: 90px; height: 90px; top: 50%; left: 5%; }
+.gear-3::before { animation-duration: 12s; }
+@keyframes spinGear { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* ===== LUỒNG ĐIỆN ===== */
+.energy-line {
+  position: fixed; z-index: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent, #00E5FF, transparent);
+  height: 1px; opacity: 0.15;
+  animation: energyPulse 4s ease-in-out infinite;
+}
+.energy-1 { top: 20%; left: 0; right: 0; animation-delay: 0s; }
+.energy-2 { top: 55%; left: 0; right: 0; animation-delay: 1.5s; height: 2px; opacity: 0.1; }
+.energy-3 { top: 80%; left: 0; right: 0; animation-delay: 3s; }
+@keyframes energyPulse {
+  0%, 100% { opacity: 0.05; transform: scaleX(0.8); }
+  50% { opacity: 0.2; transform: scaleX(1); }
+}
+
+/* ============ GATE SCREEN ============ */
+#gateScreen {
+  position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center;
+  padding: 20px; background: radial-gradient(ellipse at center, #0A1020 0%, #05060A 100%);
+}
+#gateScreen.on { display: flex; }
+.gate-box {
+  width: 100%; max-width: 380px; padding: 32px 24px;
+  background: linear-gradient(160deg, #0B0E17 0%, #0F1320 100%);
+  border: 1px solid var(--border-glow); border-radius: 20px; text-align: center;
+  box-shadow: 0 0 40px rgba(0,229,255,0.08), 0 20px 60px rgba(0,0,0,0.6);
+  position: relative; overflow: hidden;
+}
+.gate-box::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, #00E5FF, #00E676, transparent);
+  animation: gateScan 3s linear infinite;
+}
+@keyframes gateScan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.gate-logo {
+  width: 72px; height: 72px; margin: 0 auto 16px; border-radius: 18px;
+  background: #0a0612; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 30px rgba(0,229,255,0.25); overflow: hidden;
+  border: 1px solid var(--border-glow);
+}
+.gate-logo img { width: 100%; height: 100%; object-fit: cover; border-radius: 18px; }
+.gate-title {
+  font-size: 19px; font-weight: 900; color: #E0F7FA; letter-spacing: 1.5px;
+  margin-bottom: 4px; font-family: var(--mono); text-shadow: 0 0 20px rgba(0,229,255,0.4);
+}
+.gate-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 22px; letter-spacing: 1px; font-family: var(--mono); }
+.gate-input {
+  width: 100%; padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--border);
+  font-size: 14px; font-family: var(--mono); outline: none; text-transform: uppercase;
+  transition: border-color .2s, box-shadow .2s; background: #0A0D15; color: var(--primary);
+  margin-bottom: 14px; letter-spacing: 1px;
+}
+.gate-input::placeholder { color: #2A3550; }
+.gate-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,229,255,.12), 0 0 20px rgba(0,229,255,0.1); }
+.gate-btn {
+  width: 100%; padding: 15px; border-radius: 12px;
+  background: linear-gradient(135deg, #00B8D4, #00E5FF); color: #001A1F;
+  border: none; font-size: 14.5px; font-weight: 900; cursor: pointer;
+  box-shadow: 0 0 25px rgba(0,229,255,0.35); transition: transform .15s, box-shadow .2s;
+  font-family: var(--mono); letter-spacing: 2px;
+}
+.gate-btn:active { transform: scale(.97); }
+.gate-btn:disabled { background: #1A2035; color: #3A4A6A; box-shadow: none; cursor: wait; }
+.gate-msg { margin-top: 14px; padding: 10px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 600; display: none; font-family: var(--mono); }
+.gate-msg.bad { display: block; background: rgba(255,23,68,0.1); color: #FF8A80; border: 1px solid rgba(255,23,68,0.3); animation: shake .35s; }
+.gate-msg.ok { display: block; background: rgba(0,230,118,0.1); color: #69F0AE; border: 1px solid rgba(0,230,118,0.3); }
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+.gate-getkey {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 16px;
+  padding: 9px 18px; border-radius: 10px; font-size: 12px; font-weight: 800;
+  background: rgba(0,229,255,0.08); color: var(--primary); border: 1px solid var(--border-glow);
+  text-decoration: none; font-family: var(--mono); letter-spacing: 1px;
+  transition: all .2s;
+}
+.gate-getkey:hover { background: rgba(0,229,255,0.15); box-shadow: 0 0 20px rgba(0,229,255,0.15); }
+
+/* ============ LOADING DARK ============ */
+#loadingScreen {
+  position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center;
+  flex-direction: column; background: #05060A; color: #fff;
+}
+#loadingScreen.on { display: flex; }
+.loading-circle-container { position: relative; width: 140px; height: 140px; margin-bottom: 30px; }
+.loading-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+.loading-track { fill: none; stroke: #141A28; stroke-width: 4; }
+.loading-progress {
+  fill: none; stroke: url(#gradient); stroke-width: 4; stroke-linecap: round;
+  stroke-dasharray: 440; stroke-dashoffset: 440;
+  transition: stroke-dashoffset 0.1s linear;
+  filter: drop-shadow(0 0 6px rgba(0,229,255,0.5));
+}
+.loading-glow {
+  position: absolute; inset: 0; border-radius: 50%;
+  box-shadow: 0 0 30px rgba(0,229,255,0.2), inset 0 0 20px rgba(0,229,255,0.08);
+  pointer-events: none;
+}
+.loading-title-text {
+  font-size: 22px; font-weight: 900; letter-spacing: 4px; margin-bottom: 8px;
+  font-family: var(--mono); color: var(--primary); text-shadow: 0 0 20px rgba(0,229,255,0.5);
+}
+.loading-sub-text { font-size: 10px; font-weight: 600; letter-spacing: 4px; color: #3A4A6A; margin-bottom: 40px; font-family: var(--mono); }
+.loading-bar-wrapper { width: 80%; max-width: 320px; }
+.loading-bar-track { height: 4px; background: #141A28; border-radius: 2px; overflow: hidden; margin-bottom: 12px; }
+.loading-bar-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, #00B8D4, #00E5FF, #00E676); border-radius: 2px;
+  transition: width 0.1s linear; box-shadow: 0 0 10px rgba(0,229,255,0.5);
+}
+.loading-percent { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; font-family: var(--mono); color: #3A4A6A; }
+.loading-percent .active { color: var(--primary); }
+
+/* ============ TOOL SCREEN ============ */
+#toolScreen { display: none; position: relative; z-index: 10; }
+#toolScreen.on { display: block; }
+.top-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  background: linear-gradient(135deg, #0B0E17, #0F1320);
+  padding: 8px 12px; border-radius: var(--radius); margin-bottom: 12px;
+  border: 1px solid var(--border); gap: 8px;
+  box-shadow: 0 0 20px rgba(0,229,255,0.04);
+}
+.brand { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.brand-icon {
+  width: 36px; height: 36px; flex: none; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  border: 1px solid var(--border-glow); box-shadow: 0 0 15px rgba(0,229,255,0.15);
+}
+.brand-icon img { width: 100%; height: 100%; object-fit: cover; }
+.brand-text h1 { font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #E0F7FA; font-family: var(--mono); }
+.brand-text p { font-size: 9.5px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; font-family: var(--mono); letter-spacing: 0.5px; }
+.status-dot {
+  width: 6px; height: 6px; background: var(--green); border-radius: 50%;
+  box-shadow: 0 0 8px rgba(0,230,118,0.9); animation: pulseDot 1.6s ease-in-out infinite;
+}
+@keyframes pulseDot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.35);opacity:.6} }
+.top-actions { display: flex; gap: 6px; flex: none; }
+.btn-out {
+  background: rgba(255,23,68,0.1); color: #FF8A80; border: 1px solid rgba(255,23,68,0.3);
+  padding: 7px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer;
+  font-family: var(--mono); letter-spacing: 1px;
+}
+.btn-out:hover { background: rgba(255,23,68,0.2); box-shadow: 0 0 15px rgba(255,23,68,0.15); }
+.btn-tg {
+  background: rgba(0,136,204,0.12); color: #4FC3F7; border: 1px solid rgba(0,136,204,0.35);
+  padding: 7px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer;
+  font-family: var(--mono); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+  letter-spacing: 0.5px; transition: all .2s;
+}
+.btn-tg:hover { background: rgba(0,136,204,0.25); box-shadow: 0 0 15px rgba(0,136,204,0.2); }
+
+.server-counter {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+  background: linear-gradient(135deg, rgba(0,230,118,0.08), rgba(0,229,255,0.05));
+  border: 1px solid rgba(0,230,118,0.25); border-radius: 12px; padding: 11px 14px;
+  font-family: var(--mono); font-size: 11.5px; font-weight: 800; color: #69F0AE;
+  box-shadow: 0 0 20px rgba(0,230,118,0.04);
+}
+.server-counter .live-dot {
+  width: 10px; height: 10px; flex: none; background: var(--green); border-radius: 50%;
+  box-shadow: 0 0 12px rgba(0,230,118,0.95); animation: pulseDot 1.4s ease-in-out infinite;
+}
+.server-counter .num { color: #E0F7FA; font-size: 14px; font-weight: 900; }
+.server-counter .lbl { flex: 1; min-width: 0; letter-spacing: 0.5px; }
+
+#keyBadge {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  background: rgba(0,229,255,0.05); border: 1px solid var(--border-glow);
+  border-radius: 10px; padding: 9px 12px; font-size: 11px; font-weight: 700;
+  font-family: var(--mono); color: var(--primary); letter-spacing: 0.5px;
+}
+#keyBadge .kk { color: #E0F7FA; font-weight: 900; }
+#keyBadge .rr { color: #69F0AE; margin-left: auto; }
+
+.main-card {
+  background: linear-gradient(160deg, #0B0E17 0%, #0A0D15 100%);
+  border-radius: 18px; padding: 16px; border: 1px solid var(--border);
+  box-shadow: 0 0 30px rgba(0,229,255,0.03), 0 10px 40px rgba(0,0,0,0.4);
+  position: relative; overflow: hidden;
+}
+.main-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, #00E5FF44, #00E67644, transparent);
+}
+.tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.tab-btn {
+  flex: 1; min-width: 90px; padding: 14px 8px; border-radius: 10px; font-size: 12px;
+  font-weight: 800; text-align: center; cursor: pointer; border: 1px solid var(--border);
+  transition: all .2s; font-family: var(--mono); letter-spacing: 1px;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  background: #0A0D15; color: var(--text-muted);
+}
+.tab-btn.active {
+  background: linear-gradient(135deg, rgba(0,184,212,0.2), rgba(0,229,255,0.1));
+  color: var(--primary); border-color: var(--primary);
+  box-shadow: 0 0 20px rgba(0,229,255,0.15);
+}
+.tab-btn.active::after { content: '✓'; font-size: 13px; }
+
+.step-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; margin-top: 6px; }
+.step-num {
+  width: 24px; height: 24px; background: rgba(0,229,255,0.12); color: var(--primary);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 900; font-family: var(--mono);
+  border: 1px solid var(--border-glow); box-shadow: 0 0 10px rgba(0,229,255,0.1);
+}
+.step-title { font-size: 14px; font-weight: 800; color: #B0C4DE; letter-spacing: 0.5px; }
+
+.file-upload-wrapper { position: relative; width: 100%; margin-bottom: 20px; }
+.file-upload-wrapper input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 10; }
+.file-upload-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px;
+  background: #0A0D15; border: 1.5px dashed #1A2035; border-radius: 10px;
+  font-size: 13px; font-weight: 700; color: var(--text-muted); transition: all .2s;
+  font-family: var(--mono); letter-spacing: 0.5px;
+}
+.file-upload-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(0,229,255,0.03); box-shadow: 0 0 20px rgba(0,229,255,0.05); }
+
+.packages { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pkg-card {
+  border: 1px solid var(--border); border-radius: 12px; padding: 14px;
+  position: relative; cursor: pointer; transition: all .2s; background: #0A0D15;
+}
+.pkg-card.selected {
+  border-color: var(--green);
+  background: linear-gradient(135deg, rgba(0,230,118,0.08), rgba(0,229,255,0.04));
+  box-shadow: 0 0 20px rgba(0,230,118,0.1);
+}
+.pkg-tags { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; min-height: 20px; }
+.tag { font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 5px; text-transform: uppercase; font-family: var(--mono); letter-spacing: 0.5px; }
+.tag-popular { background: linear-gradient(135deg, #00B8D4, #00E5FF); color: #001A1F; }
+.tag-vip { background: linear-gradient(135deg, #FFC400, #FF9800); color: #1A1200; }
+.tag-new { background: linear-gradient(135deg, #EC4899, #8B5CF6); color: #fff; }
+.pkg-title { font-size: 12.5px; font-weight: 800; color: #B0C4DE; letter-spacing: 0.3px; }
+
+.btn-submit {
+  width: 100%; padding: 16px; background: linear-gradient(135deg, #00B8D4, #00E5FF);
+  color: #001A1F; border: none; border-radius: 12px; font-size: 14.5px; font-weight: 900;
+  margin-top: 20px; cursor: pointer; box-shadow: 0 0 25px rgba(0,229,255,0.3);
+  transition: transform .2s, box-shadow .2s; font-family: var(--mono); letter-spacing: 2px;
+}
+.btn-submit:active { transform: scale(.98); }
+.btn-submit:disabled { background: #1A2035; color: #3A4A6A; box-shadow: none; cursor: not-allowed; }
+.tab-content { display: none; animation: fadeIn .3s ease; }
+.tab-content.active { display: block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+
+.msg { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 12.5px; display: none; line-height: 1.6; font-family: var(--mono); }
+.msg.ok { background: rgba(0,230,118,0.08); color: #69F0AE; display: block; border: 1px solid rgba(0,230,118,0.3); }
+.msg.bad { background: rgba(255,23,68,0.08); color: #FF8A80; display: block; border: 1px solid rgba(255,23,68,0.3); }
+.msg.warn { background: rgba(255,196,0,0.08); color: #FFD54F; display: block; border: 1px solid rgba(255,196,0,0.3); }
+
+/* ============ CODE OFFSET RUNNING ============ */
+.code-offset-box {
+  margin-top: 14px; background: #060810; border: 1px solid var(--border-glow);
+  border-radius: 10px; padding: 12px 14px; font-family: var(--mono); font-size: 10.5px;
+  line-height: 1.8; color: var(--primary); max-height: 140px; overflow-y: auto;
+  display: none; position: relative; letter-spacing: 0.3px;
+}
+.code-offset-box.on { display: block; }
+.code-offset-box::-webkit-scrollbar { width: 4px; }
+.code-offset-box::-webkit-scrollbar-thumb { background: #1A2035; border-radius: 2px; }
+.code-offset-box .off-line { opacity: 0.85; animation: fadeInCode .15s ease; }
+.code-offset-box .off-line .addr { color: #3A4A6A; }
+.code-offset-box .off-line .hex { color: #69F0AE; }
+.code-offset-box .cursor-blink { display: inline-block; width: 7px; height: 12px; background: var(--primary); animation: blink 0.8s step-end infinite; vertical-align: middle; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes fadeInCode { from{opacity:0; transform:translateX(-4px)} to{opacity:0.85; transform:translateX(0)} }
+
+/* ============ LOADING OVERLAY ============ */
+.loading-overlay {
+  position: fixed; inset: 0; z-index: 9999; background: rgba(5,6,10,0.92);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.loading-overlay.on { display: flex; }
+.loading-box {
+  background: linear-gradient(160deg, #0B0E17, #0F1320); border-radius: 20px; padding: 40px 32px;
+  text-align: center; max-width: 340px; width: 100%;
+  box-shadow: 0 0 50px rgba(0,229,255,0.1), 0 20px 60px rgba(0,0,0,0.6);
+  border: 1px solid var(--border-glow); animation: scaleIn .3s ease;
+  position: relative; overflow: hidden;
+}
+.loading-box::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, #00E5FF, #00E676, transparent);
+  animation: gateScan 2s linear infinite;
+}
+@keyframes scaleIn { from{transform:scale(.9);opacity:0} to{transform:scale(1);opacity:1} }
+.loading-box-title { font-size: 11px; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 20px; font-family: var(--mono); }
+.loading-box-num { font-size: 90px; font-weight: 900; color: var(--primary); line-height: 1; font-family: var(--mono); animation: pulse 1s ease infinite; text-shadow: 0 0 40px rgba(0,229,255,0.4); }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+.loading-box-text { font-size: 13px; color: var(--text-muted); margin-top: 20px; font-weight: 600; min-height: 20px; font-family: var(--mono); }
+.loading-box-num.success { color: var(--green); animation: none; text-shadow: 0 0 40px rgba(0,230,118,0.4); }
+.loading-box-text.success { color: var(--green); }
+.loading-box-num.error { color: var(--red); animation: none; text-shadow: 0 0 40px rgba(255,23,68,0.4); }
+.loading-box-text.error { color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- ===== BACKGROUND EFFECTS ===== -->
+<div id="bgCode"></div>
+<div class="gear-bg gear-1"></div>
+<div class="gear-bg gear-2"></div>
+<div class="gear-bg gear-3"></div>
+<div class="energy-line energy-1"></div>
+<div class="energy-line energy-2"></div>
+<div class="energy-line energy-3"></div>
+
+<!-- ============ GATE SCREEN ============ -->
+<div id="gateScreen" class="on">
+  <div class="gate-box">
+    <div class="gate-logo">
+      <img src="https://cdn.phototourl.com/member/2026-10-14-637ac9d2-39be-49f5-bde3-c0a5ef424fde.jpg" alt="DOLONG CYBER">
+    </div>
+    <div class="gate-title">DOLONG-CYBER</div>
+    <div class="gate-sub">[ NHẬP KEY ĐỂ TRUY CẬP HỆ THỐNG ]</div>
+    <input type="text" id="gateKeyInput" class="gate-input" placeholder="DOLONG-FREE" spellcheck="false" autocomplete="off">
+    <button type="button" id="gateBtn" class="gate-btn">KẾT NỐI</button>
+    <div id="gateMsg" class="gate-msg"></div>
+    <a href="https://apikey-plum.vercel.app" target="_blank" rel="noopener" class="gate-getkey">🔑 GET KEY FREE</a>
+  </div>
+</div>
+
+<!-- ============ LOADING DARK ============ -->
+<div id="loadingScreen">
+  <div class="loading-circle-container">
+    <div class="loading-glow"></div>
+    <svg class="loading-svg" viewBox="0 0 160 160">
+      <defs>
+        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#00B8D4" />
+          <stop offset="100%" stop-color="#00E676" />
+        </linearGradient>
+      </defs>
+      <circle class="loading-track" cx="80" cy="80" r="70"></circle>
+      <circle class="loading-progress" cx="80" cy="80" r="70"></circle>
+    </svg>
+  </div>
+  <div class="loading-title-text">DOLONG</div>
+  <div class="loading-sub-text">CYBER SYSTEM ONLINE</div>
+  <div class="loading-bar-wrapper">
+    <div class="loading-bar-track">
+      <div class="loading-bar-fill" id="loadingBarFill"></div>
+    </div>
+    <div class="loading-percent">
+      <span id="loadingPercentLeft">0%</span>
+      <span class="active" id="loadingPercentRight">0%</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TOOL SCREEN ============ -->
+<div id="toolScreen">
+  <div class="top-bar">
+    <div class="brand">
+      <div class="brand-icon">
+        <img src="https://cdn.phototourl.com/member/2026-10-14-637ac9d2-39be-49f5-bde3-c0a5ef424fde.jpg" alt="logo">
+      </div>
+      <div class="brand-text">
+        <h1>DOLONG-CYBER TOOL</h1>
+        <p><span class="status-dot"></span> HỆ THỐNG ONLINE</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <a href="https://t.me/dolong07" target="_blank" rel="noopener" class="btn-tg">✈ @dolong07</a>
+      <button type="button" class="btn-out" id="btnOut">THOÁT</button>
+    </div>
+  </div>
+
+  <div class="server-counter">
+    <span class="live-dot"></span>
+    <span class="lbl">
+      SERVER ACTIVE: <span class="num" id="serverCounterNum">1.337</span> REQUESTS
+    </span>
+  </div>
+
+  <div id="keyBadge">
+    <span>🔐</span>
+    <span class="kk" id="keyBadgeKey">DOLONG-FREE</span>
+    <span class="rr" id="keyBadgeRemain">CÒN ∞/∞</span>
+  </div>
+
+  <div class="main-card">
+    <div class="tabs">
+      <button class="tab-btn active" id="btnTabThuong" onclick="switchTab('aim-thuong')">AIM THƯỜNG</button>
+      <button class="tab-btn" id="btnTabVip" onclick="switchTab('vip')">VIP</button>
+      <button class="tab-btn" id="btnTabPro" onclick="switchTab('pro')">PRO ⚡</button>
+    </div>
+
+    <!-- ============ TAB 1: AIM THƯỜNG ============ -->
+    <div id="tab-aim-thuong" class="tab-content active">
+      <div class="step-header"><div class="step-num">1</div><div class="step-title">CHỌN FILE GỐC</div></div>
+      <div class="file-upload-wrapper">
+        <input type="file" id="fileThuong">
+        <div class="file-upload-btn" id="btnFileThuong">📁 CHỌN FILE BUNDLE</div>
+      </div>
+      <div class="step-header"><div class="step-num">2</div><div class="step-title">CHỌN CHỨC NĂNG</div></div>
+      <div class="packages" id="funcListThuong">
+        <div class="pkg-card selected" data-val="func1" onclick="selectFunc('thuong',this)"><div class="pkg-tags"><span class="tag tag-popular">HOT</span></div><div class="pkg-title">1 · Smooth Aim</div></div>
+        <div class="pkg-card" data-val="func2" onclick="selectFunc('thuong',this)"><div class="pkg-tags"></div><div class="pkg-title">2 · Drag Aim</div></div>
+        <div class="pkg-card" data-val="func3" onclick="selectFunc('thuong',this)"><div class="pkg-tags"></div><div class="pkg-title">3 · Snap Aim</div></div>
+        <div class="pkg-card" data-val="func4" onclick="selectFunc('thuong',this)"><div class="pkg-tags"></div><div class="pkg-title">4 · Body Lock</div></div>
+        <div class="pkg-card" data-val="func5" onclick="selectFunc('thuong',this)"><div class="pkg-tags"></div><div class="pkg-title">5 · Head Track</div></div>
+        <div class="pkg-card" data-val="func6" onclick="selectFunc('thuong',this)"><div class="pkg-tags"></div><div class="pkg-title">6 · Soft Aim</div></div>
+        <div class="pkg-card" data-val="func7" onclick="selectFunc('thuong',this)"><div class="pkg-tags"></div><div class="pkg-title">7 · Hard Aim</div></div>
+        <div class="pkg-card" data-val="func8" onclick="selectFunc('thuong',this)"><div class="pkg-tags"></div><div class="pkg-title">8 · Full Aim</div></div>
+      </div>
+      <button class="btn-submit" id="submitThuong">XỬ LÝ & TẢI FILE</button>
+      <div id="msgThuong" class="msg"></div>
+      <div id="codeOffsetThuong" class="code-offset-box"></div>
+    </div>
+
+    <!-- ============ TAB 2: VIP ============ -->
+    <div id="tab-vip" class="tab-content">
+      <div class="step-header"><div class="step-num">1</div><div class="step-title">CHỌN FILE GỐC</div></div>
+      <div class="file-upload-wrapper">
+        <input type="file" id="fileVip">
+        <div class="file-upload-btn" id="btnFileVip">📁 CHỌN FILE BUNDLE</div>
+      </div>
+      <div class="step-header"><div class="step-num">2</div><div class="step-title">CHỌN CHỨC NĂNG VIP</div></div>
+      <div class="packages" id="funcListVip">
+        <div class="pkg-card selected" data-val="vip1" onclick="selectFunc('vip',this)"><div class="pkg-tags"><span class="tag tag-vip">VIP</span></div><div class="pkg-title">1 · Ultra Aim</div></div>
+        <div class="pkg-card" data-val="vip2" onclick="selectFunc('vip',this)"><div class="pkg-tags"><span class="tag tag-vip">VIP</span></div><div class="pkg-title">2 · Mega Drag</div></div>
+        <div class="pkg-card" data-val="vip3" onclick="selectFunc('vip',this)"><div class="pkg-tags"><span class="tag tag-vip">VIP</span></div><div class="pkg-title">3 · Ghost Mode</div></div>
+        <div class="pkg-card" data-val="vip4" onclick="selectFunc('vip',this)"><div class="pkg-tags"><span class="tag tag-vip">VIP</span></div><div class="pkg-title">4 · Super Snap</div></div>
+        <div class="pkg-card" data-val="vip5" onclick="selectFunc('vip',this)"><div class="pkg-tags"><span class="tag tag-vip">VIP</span></div><div class="pkg-title">5 · Auto Lock</div></div>
+        <div class="pkg-card" data-val="vip6" onclick="selectFunc('vip',this)"><div class="pkg-tags"><span class="tag tag-vip">VIP</span></div><div class="pkg-title">6 · Full Combo</div></div>
+      </div>
+      <button class="btn-submit" id="submitVip">XỬ LÝ & TẢI FILE</button>
+      <div id="msgVip" class="msg"></div>
+      <div id="codeOffsetVip" class="code-offset-box"></div>
+    </div>
+
+    <!-- ============ TAB 3: PRO ============ -->
+    <div id="tab-pro" class="tab-content">
+      <div class="step-header"><div class="step-num">1</div><div class="step-title">CHỌN FILE GỐC</div></div>
+      <div class="file-upload-wrapper">
+        <input type="file" id="filePro">
+        <div class="file-upload-btn" id="btnFilePro">📁 CHỌN FILE BUNDLE</div>
+      </div>
+      <div class="step-header"><div class="step-num">2</div><div class="step-title">CHỌN CHỨC NĂNG PRO</div></div>
+      <div class="packages" id="funcListPro">
+        <div class="pkg-card selected" data-val="pro1" onclick="selectFunc('pro',this)"><div class="pkg-tags"><span class="tag tag-new">NEW</span></div><div class="pkg-title">1 · Ultra Aim</div></div>
+        <div class="pkg-card" data-val="pro2" onclick="selectFunc('pro',this)"><div class="pkg-tags"><span class="tag tag-new">NEW</span></div><div class="pkg-title">2 · Mega Drag</div></div>
+        <div class="pkg-card" data-val="pro3" onclick="selectFunc('pro',this)"><div class="pkg-tags"><span class="tag tag-popular">HOT</span></div><div class="pkg-title">3 · Ghost Mode</div></div>
+        <div class="pkg-card" data-val="pro4" onclick="selectFunc('pro',this)"><div class="pkg-tags"></div><div class="pkg-title">4 · Super Snap</div></div>
+        <div class="pkg-card" data-val="pro5" onclick="selectFunc('pro',this)"><div class="pkg-tags"></div><div class="pkg-title">5 · Auto Lock</div></div>
+        <div class="pkg-card" data-val="pro6" onclick="selectFunc('pro',this)"><div class="pkg-tags"><span class="tag tag-vip">PRO</span></div><div class="pkg-title">6 · Full Combo</div></div>
+      </div>
+      <div class="step-header"><div class="step-num">3</div><div class="step-title">CHẾ ĐỘ XỬ LÝ</div></div>
+      <div class="packages" style="grid-template-columns: 1fr 1fr 1fr;" id="modeListPro">
+        <div class="pkg-card selected" data-val="speed" onclick="selectFunc('pro-mode',this)"><div class="pkg-tags"></div><div class="pkg-title" style="font-size:11px;">⚡ NHANH</div></div>
+        <div class="pkg-card" data-val="balance" onclick="selectFunc('pro-mode',this)"><div class="pkg-tags"></div><div class="pkg-title" style="font-size:11px;">⚖ CÂN BẰNG</div></div>
+        <div class="pkg-card" data-val="quality" onclick="selectFunc('pro-mode',this)"><div class="pkg-tags"></div><div class="pkg-title" style="font-size:11px;">💎 CHẤT LƯỢNG</div></div>
+      </div>
+      <button class="btn-submit" id="submitPro">XỬ LÝ & TẢI FILE</button>
+      <div id="msgPro" class="msg"></div>
+      <div id="codeOffsetPro" class="code-offset-box"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LOADING OVERLAY ============ -->
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loading-box">
+    <div class="loading-box-title" id="loadingTitle">ĐANG XỬ LÝ</div>
+    <div class="loading-box-num" id="loadingNum">3</div>
+    <div class="loading-box-text" id="loadingText">CHUẨN BỊ TẢI FILE...</div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CẤU HÌNH
+   ============================================================ */
+var VALID_KEYS = ["DOLONG-FREE"];
+var KEY_STORAGE = "dolong_active_key";
+var CURRENT_KEY = "";
+var $ = function(id){ return document.getElementById(id); };
+
+/* ============ NỀN CODE ============ */
+(function bgCodeEffect(){
+  var el = $("bgCode");
+  if(!el) return;
+  var codeLines = [
+    "0x7FFE3A2B: 48 8B 05 12 34 56 78  mov rax, [rip+0x78563412]",
+    "0x7FFE3A33: 48 89 C1              mov rcx, rax",
+    "0x7FFE3A36: 48 83 C1 08           add rcx, 0x8",
+    "0x7FFE3A3A: FF 15 20 30 40 50     call qword ptr [rip+0x50403020]",
+    "0x7FFE3A40: C3                    ret",
+    "0x7FFE3A41: 90                    nop",
+    "0x7FFE3A42: 55                    push rbp",
+    "0x7FFE3A43: 48 89 E5              mov rbp, rsp",
+    "0x7FFE3A46: 48 83 EC 20           sub rsp, 0x20",
+    "0x7FFE3A4A: 48 8D 0D 0F 00 00 00  lea rcx, [rip+0xf]",
+    "0x7FFE3A51: E8 AA BB CC DD        call 0x7FFEF5F500",
+    "0x7FFE3A56: 31 C0                 xor eax, eax",
+    "0x7FFE3A58: 48 83 C4 20           add rsp, 0x20",
+    "0x7FFE3A5C: 5D                    pop rbp",
+    "0x7FFE3A5D: C3                    ret",
+    "0x7FFE3A5E: CC CC CC CC CC CC     int3",
+    "0x7FFE3A64: 48 8B 44 24 08        mov rax, [rsp+0x8]",
+    "0x7FFE3A69: 48 85 C0              test rax, rax",
+    "0x7FFE3A6C: 74 05                 je 0x7FFE3A73",
+    "0x7FFE3A6E: E8 8D 00 00 00        call 0x7FFE3B00",
+    "0x7FFE3A73: C3                    ret",
+    "0x7FFE3A74: 48 89 5C 24 08        mov [rsp+0x8], rbx",
+    "0x7FFE3A79: 57                    push rdi",
+    "0x7FFE3A7A: 48 83 EC 20           sub rsp, 0x20",
+    "0x7FFE3A7E: 48 8B D9              mov rbx, rcx",
+    "0x7FFE3A81: 48 8B F9              mov rdi, rcx",
+    "0x7FFE3A84: 48 85 C9              test rcx, rcx",
+    "0x7FFE3A87: 0F 84 8A 00 00 00     je 0x7FFE3B17",
+    "0x7FFE3A8D: 48 8B 49 08           mov rcx, [rcx+0x8]",
+    "0x7FFE3A91: 48 85 C9              test rcx, rcx",
+    "0x7FFE3A94: 74 0C                 je 0x7FFE3AA2",
+    "0x7FFE3A96: 48 8B 01              mov rax, [rcx]",
+    "0x7FFE3A99: FF 50 10              call qword ptr [rax+0x10]",
+    "0x7FFE3A9C: 48 8B 4F 08           mov rcx, [rdi+0x8]",
+    "0x7FFE3AA0: EB 02                 jmp 0x7FFE3AA4",
+    "0x7FFE3AA2: 31 C9                 xor ecx, ecx",
+    "0x7FFE3AA4: 48 8B 07              mov rax, [rdi]",
+    "0x7FFE3AA7: 48 8D 54 24 38        lea rdx, [rsp+0x38]",
+    "0x7FFE3AAC: FF 50 18              call qword ptr [rax+0x18]",
+    "0x7FFE3AAF: 48 8B C8              mov rcx, rax",
+    "0x7FFE3AB2: E8 49 FF FF FF        call 0x7FFE3A00",
+    "0x7FFE3AB7: 48 83 C4 20           add rsp, 0x20",
+    "0x7FFE3ABB: 5F                    pop rdi",
+    "0x7FFE3ABC: C3                    ret"
+  ];
+  var repeat = 4;
+  var all = [];
+  for(var i=0;i<repeat;i++) all = all.concat(codeLines);
+  el.innerHTML = '<div class="line">' + all.join('<br>') + '</div>';
+})();
+
+/* ============ KEY ============ */
+function gateMsg(type, text){
+  var box = $("gateMsg");
+  box.className = "gate-msg " + type;
+  box.textContent = text;
+}
+
+function handleGate(){
+  var input = $("gateKeyInput");
+  var btn = $("gateBtn");
+  var key = (input.value || "").trim().toUpperCase();
+
+  if(!key){
+    gateMsg("bad", "⚠ VUI LÒNG NHẬP KEY.");
+    return;
+  }
+  if(VALID_KEYS.indexOf(key) === -1){
+    gateMsg("bad", "❌ KEY KHÔNG HỢP LỆ.");
+    return;
+  }
+
+  CURRENT_KEY = key;
+  try { sessionStorage.setItem(KEY_STORAGE, key); } catch(e){}
+
+  gateMsg("ok", "✅ XÁC MINH THÀNH CÔNG! ĐANG KẾT NỐI...");
+  btn.disabled = true;
+  btn.textContent = "ĐANG KẾT NỐI...";
+
+  setTimeout(enterTool, 500);
+}
+
+function enterTool(){
+  $("gateScreen").classList.remove("on");
+  $("gateScreen").style.display = "none";
+
+  $("keyBadgeKey").textContent = CURRENT_KEY;
+  $("keyBadgeRemain").textContent = "CÒN ∞/∞";
+
+  var loading = $("loadingScreen");
+  var progress = document.querySelector(".loading-progress");
+  var barFill = $("loadingBarFill");
+  var percentText = $("loadingPercentRight");
+  var percentLeft = $("loadingPercentLeft");
+
+  loading.classList.add("on");
+  percentLeft.textContent = "0%";
+
+  var start = performance.now();
+  var duration = 2800;
+
+  function update(now){
+    var timePassed = now - start;
+    var val = Math.min(timePassed / duration, 1);
+    var pct = Math.floor(val * 100);
+
+    if(progress) progress.style.strokeDashoffset = 440 - (440 * val);
+    if(barFill) barFill.style.width = pct + "%";
+    if(percentText) percentText.textContent = pct + "%";
+
+    if(val < 1){
+      requestAnimationFrame(update);
+    } else {
+      setTimeout(function(){
+        loading.classList.remove("on");
+        $("toolScreen").classList.add("on");
+      }, 200);
+    }
+  }
+  requestAnimationFrame(update);
+}
+
+function exitTool(){
+  try { sessionStorage.removeItem(KEY_STORAGE); } catch(e){}
+  CURRENT_KEY = "";
+  $("toolScreen").classList.remove("on");
+  $("gateScreen").style.display = "flex";
+  $("gateScreen").classList.add("on");
+  $("gateKeyInput").value = "";
+  $("gateMsg").className = "gate-msg";
+  $("gateMsg").textContent = "";
+  var btn = $("gateBtn");
+  btn.disabled = false;
+  btn.textContent = "KẾT NỐI";
+}
+
+/* ============ TAB ============ */
+function switchTab(tabId){
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => {
+    el.classList.remove('active');
+    el.classList.add('inactive');
+  });
+  document.getElementById('tab-' + tabId).classList.add('active');
+  const btn = document.getElementById('btnTab' + (tabId === 'aim-thuong' ? 'Thuong' : tabId === 'vip' ? 'Vip' : 'Pro'));
+  if(btn){ btn.classList.remove('inactive'); btn.classList.add('active'); }
+}
+
+/* ============ CHỌN CHỨC NĂNG ============ */
+function selectFunc(type, el){
+  const map = { thuong: 'funcListThuong', vip: 'funcListVip', pro: 'funcListPro', 'pro-mode': 'modeListPro' };
+  const list = document.getElementById(map[type]);
+  if(!list) return;
+  list.querySelectorAll('.pkg-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+/* ============ HIỂN THỊ TÊN FILE ============ */
+function formatSize(b){
+  if(b === 0) return '0 B';
+  const k = 1024, s = ['B','KB','MB','GB'];
+  const i = Math.floor(Math.log(b) / Math.log(k));
+  return (b / Math.pow(k, i)).toFixed(2) + ' ' + s[i];
+}
+function bindFileInput(inputId, btnId){
+  const input = document.getElementById(inputId);
+  const btn = document.getElementById(btnId);
+  if(!input || !btn) return;
+  input.addEventListener('change', () => {
+    if(input.files && input.files.length > 0){
+      const f = input.files[0];
+      btn.innerHTML = '✅ <b>' + f.name + '</b> (' + formatSize(f.size) + ')';
+      btn.style.borderColor = '#00E676';
+      btn.style.color = '#69F0AE';
+      btn.style.background = 'rgba(0,230,118,0.06)';
+    } else {
+      btn.innerHTML = '📁 CHỌN FILE BUNDLE';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+      btn.style.background = '';
+    }
+  });
+}
+bindFileInput('fileThuong', 'btnFileThuong');
+bindFileInput('fileVip', 'btnFileVip');
+bindFileInput('filePro', 'btnFilePro');
+
+/* ============ CODE OFFSET RUNNING ============ */
+function runCodeOffset(targetId, fileInfo, cb){
+  var box = $(targetId);
+  if(!box) { if(cb) cb(); return; }
+  box.classList.add('on');
+  box.innerHTML = '';
+
+  var baseAddr = 0x7FFE0000 + Math.floor(Math.random() * 0x10000);
+  var maxLines = 18;
+  var count = 0;
+
+  function randomHex(len){
+    var s = '';
+    for(var i=0;i<len;i++) s += Math.floor(Math.random()*16).toString(16).toUpperCase();
+    return s;
+  }
+  function randomInstr(){
+    var ops = [
+      '48 8B 05', '48 89 C1', '48 83 C1', 'FF 15', 'C3', '90',
+      '55', '48 89 E5', '48 83 EC', '48 8D 0D', 'E8', '31 C0',
+      '48 83 C4', '5D', 'CC CC CC', '48 8B 44 24', '48 85 C0',
+      '74 05', 'E8 8D 00 00 00', '48 89 5C 24', '57', '48 8B D9',
+      '48 8B F9', '48 85 C9', '0F 84', '48 8B 49', '48 8B 01',
+      'FF 50 10', 'FF 50 18', '48 8B C8', '48 8B 07', '48 8D 54 24',
+      'EB 02', '31 C9'
+    ];
+    var op = ops[Math.floor(Math.random()*ops.length)];
+    var rest = randomHex(2) + ' ' + randomHex(2);
+    return op + ' ' + rest + ' ' + ' '.repeat(Math.floor(Math.random()*4));
+  }
+
+  var timer = setInterval(function(){
+    if(count >= maxLines){
+      clearInterval(timer);
+      box.innerHTML += '<div class="off-line" style="color:#00E676;margin-top:4px;">[+] DONE — FILE: ' + (fileInfo ? fileInfo : 'output.bundle') + '</div>';
+      if(cb) setTimeout(cb, 300);
+      return;
+    }
+    var addr = (baseAddr + count * 4).toString(16).toUpperCase();
+    var hex = randomInstr();
+    box.innerHTML += '<div class="off-line"><span class="addr">0x' + addr + ':</span> <span class="hex">' + hex + '</span></div>';
+    box.scrollTop = box.scrollHeight;
+    count++;
+  }, 60);
+}
+
+/* ============ XỬ LÝ ============ */
+function processFile(tabId, msgId, codeId, fileInputId, pkgListId){
+  var msg = $(msgId);
+  var codeBox = $(codeId);
+  var input = $(fileInputId);
+  var overlay = $("loadingOverlay");
+  var numEl = $("loadingNum");
+  var textEl = $("loadingText");
+  var titleEl = $("loadingTitle");
+
+  if(codeBox) { codeBox.classList.remove('on'); codeBox.innerHTML = ''; }
+  msg.className = 'msg';
+  msg.textContent = '';
+
+  if(!input || !input.files || input.files.length === 0){
+    msg.className = 'msg bad';
+    msg.textContent = '⚠ VUI LÒNG CHỌN FILE BUNDLE TRƯỚC.';
+    return;
+  }
+
+  var file = input.files[0];
+  var selectedPkg = document.querySelector('#' + pkgListId + ' .pkg-card.selected');
+  var pkgName = selectedPkg ? selectedPkg.querySelector('.pkg-title').textContent.trim() : 'Unknown';
+
+  overlay.classList.add("on");
+  numEl.className = 'loading-box-num';
+  textEl.className = 'loading-box-text';
+  titleEl.textContent = 'ĐANG XỬ LÝ';
+  numEl.textContent = '3';
+  textEl.textContent = 'CHUẨN BỊ TẢI FILE...';
+
+  var steps = [
+    { num: '3', text: 'ĐANG PHÂN TÍCH FILE...' },
+    { num: '2', text: 'ĐANG PATCH CODE OFFSET...' },
+    { num: '1', text: 'ĐANG ĐÓNG GÓI OUTPUT...' }
+  ];
+  var idx = 0;
+
+  function nextStep(){
+    if(idx >= steps.length){
+      numEl.className = 'loading-box-num success';
+      numEl.textContent = '✓';
+      textEl.className = 'loading-box-text success';
+      textEl.textContent = 'HOÀN TẤT — ĐANG CHẠY CODE...';
+
+      setTimeout(function(){
+        overlay.classList.remove("on");
+        msg.className = 'msg ok';
+        msg.textContent = '✅ XỬ LÝ THÀNH CÔNG: ' + file.name + ' → ' + pkgName;
+        runCodeOffset(codeId, file.name, function(){
+          msg.textContent = '✅ ĐÃ TẢI FILE: ' + file.name + ' (PATCH: ' + pkgName + ')';
+        });
+      }, 600);
+      return;
+    }
+    var s = steps[idx];
+    numEl.textContent = s.num;
+    textEl.textContent = s.text;
+    idx++;
+    setTimeout(nextStep, 900);
+  }
+  nextStep();
+}
+
+/* ============ GẮN SỰ KIỆN ============ */
+$("gateBtn").addEventListener("click", handleGate);
+$("gateKeyInput").addEventListener("keydown", function(e){
+  if(e.key === "Enter"){ e.preventDefault(); handleGate(); }
+});
+$("gateKeyInput").addEventListener("input", function(){
+  this.value = this.value.toUpperCase();
+});
+$("btnOut").addEventListener("click", exitTool);
+
+$("submitThuong").addEventListener("click", function(){
+  processFile('aim-thuong', 'msgThuong', 'codeOffsetThuong', 'fileThuong', 'funcListThuong');
+});
+$("submitVip").addEventListener("click", function(){
+  processFile('vip', 'msgVip', 'codeOffsetVip', 'fileVip', 'funcListVip');
+});
+$("submitPro").addEventListener("click", function(){
+  processFile('pro', 'msgPro', 'codeOffsetPro', 'filePro', 'funcListPro');
+});
+
+/* ============ AUTO SKIP NẾU ĐÃ CÓ SESSION ============ */
+(function autoCheck(){
+  try {
+    var saved = sessionStorage.getItem(KEY_STORAGE);
+    if(saved && VALID_KEYS.indexOf(saved) !== -1){
+      CURRENT_KEY = saved;
+      $("gateScreen").classList.remove("on");
+      $("gateScreen").style.display = "none";
+      $("keyBadgeKey").textContent = saved;
+      $("keyBadgeRemain").textContent = "CÒN ∞/∞";
+      $("toolScreen").classList.add("on");
+    }
+  } catch(e){}
+})();
+
+/* ============ SERVER COUNTER ============ */
+(function counterAnim(){
+  var el = $("serverCounterNum");
+  if(!el) return;
+  setInterval(function(){
+    var n = 1337 + Math.floor(Math.random() * 420);
+    el.textContent = n.toLocaleString('vi-VN');
+  }, 2200);
+})();
+</script>
+
+</body>
+</html>
